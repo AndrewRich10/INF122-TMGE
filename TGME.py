@@ -20,22 +20,10 @@ class Direction(Enum):
 class TileContents:
     def __init__(self, colors: List[str]):
         self.colors = colors
-        self.content = random.choice(colors)
+        self.content = self.getRandomColor()
 
     def getRandomColor(self) -> str:
         return random.choice(self.colors)
-
-    def matchHorizontal(self, x: int) -> bool:
-        return self.content == x
-
-    def matchVertical(self, x: int) -> bool:
-        return self.content == x
-
-    def matchDiagonal(self, x: int) -> bool:
-        return self.content == x
-
-    def matchAllDirections(self, x: int) -> bool:
-        return self.content == x
 
     def swapPositions(self, tile: 'Tile') -> None:
         self.content, tile.contents.content = tile.contents.content, self.content

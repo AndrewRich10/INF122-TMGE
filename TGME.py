@@ -123,17 +123,86 @@ class Board:
         return "\n".join([" ".join([str(tile) for tile in row]) for row in self.board])
 
 
-# Testing the enhanced Board class with match clearing, gravity, and refill
-if __name__ == "__main__":
+# Player class
+class PlayerProfile:
+    def __init__(self, player_id: int, colors: List[str], height: int, width: int):
+        self.player_id = player_id
+        self.board = Board(height, width, colors)
+        self.score = 0
+
+    def __repr__(self):
+        return f"Player {self.player_id}"
+
+
+# Game logic to handle 2 players
+def play_game():
     colors = ['R', 'G', 'B', 'Y']  # Red, Green, Blue, Yellow
-    board = Board(5, 5, colors)
-    print("Initial Board:")
-    print(board.getBoardDisplay())
+    height = 5
+    width = 5
 
-    # Simulate a match-clear-fill cycle
-    while board.clearMatches():
-        board.applyGravity()
-        board.fillMissingTiles()
+    # Create two players with their respective boards
+    player1 = PlayerProfile(1, colors, height, width)
+    player2 = PlayerProfile(2, colors, height, width)
+    current_player = player1  # Start with Player 1
 
-    print("\nBoard After Clearing Matches, Applying Gravity, and Refilling:")
-    print(board.getBoardDisplay())
+    while True:
+        print(f"\n{current_player}'s turn")
+        print(current_player.board.getBoardDisplay())
+
+
+        try:
+            # Get first tile to swap
+            first_tile_input = input("First tile (row col): ").strip()
+            if first_tile_input.lower() == 'exit':
+                print("Game Over!")
+                break
+
+            first_row, first_col = map(int, first_tile_input.split())
+            first_tile = current_player.board.getTileAt(first_row, first_col)
+
+            # Get second tile to swap
+            second_tile_input = input("Second tile (row col): ").strip()
+            if second_tile_input.lower() == 'exit':
+                print("Game Over!")
+                break
+
+            second_row, second_col = map(int, second_tile_input.split())
+            second_tile = current_player.board.getTileAt(second_row, second_col)
+
+            if first_tile and second_tile:
+                current_player.board.swapPositions(first_tile, second_tile)
+
+                # After swapping, clear matches and apply gravity
+                while current_player.board.clearMatches():
+                    current_player.board.applyGravity()
+                    current_player.board.fillMissingTiles()
+
+                # Switch players
+                current_player = player2 if current_player == player1 else player1
+            else:
+                print("Invalid tile positions. Try again.")
+        except ValueError:
+            print("Invalid input. Please enter valid row and column numbers.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+
+if __name__ == "__main__":
+    print("Welcome to TMGE! Input 'exit' at any time to quit the game for both users!")
+    play_game()
+
+
+# # Testing the enhanced Board class with match clearing, gravity, and refill
+# if __name__ == "__main__":
+#     colors = ['R', 'G', 'B', 'Y']  # Red, Green, Blue, Yellow
+#     board = Board(5, 5, colors)
+#     print("Initial Board:")
+#     print(board.getBoardDisplay())
+
+#     # Simulate a match-clear-fill cycle
+#     while board.clearMatches():
+#         board.applyGravity()
+#         board.fillMissingTiles()
+
+#     print("\nBoard After Clearing Matches, Applying Gravity, and Refilling:")
+#     print(board.getBoardDisplay())

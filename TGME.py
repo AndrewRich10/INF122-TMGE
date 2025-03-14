@@ -1,7 +1,7 @@
 # Import necessary modules
 import random
 from enum import Enum
-from typing import List, Callable, Optional, Any
+from typing import List, Callable, Optional, Any, Set
 
 
 # Enum for Direction
@@ -18,21 +18,21 @@ class Direction(Enum):
 
 # TileContents class
 class TileContents:
-    def __init__(self, colors: List[str]):
+    def __init__(self, colors: List[Any]):
         self.colors = colors
-        self.content = self.getRandomColor()
+        self.content = self.getRandomContent()
 
-    def getRandomColor(self) -> str:
+    def getRandomContent(self) -> Any:
         return random.choice(self.colors)
 
     def swapPositions(self, tile: 'Tile') -> None:
         self.content, tile.contents.content = tile.contents.content, self.content
 
     def isEmpty(self) -> bool:
-        return self.content == ""
+        return self.content is None
 
     def clearContent(self) -> None:
-        self.content = ""
+        self.content = None
 
 
 # Tile class
@@ -41,10 +41,10 @@ class Tile:
         self.position = position
         self.contents = TileContents(colors)
         self.board = board
-        self.partOfShape = None  # To be used with TileShape
+        self.partOfShape = None
 
     def __repr__(self):
-        return repr(self.contents.content) or " "
+        return repr(self.contents.content) if self.contents.content is not None else " "
 
 
 # Board class
@@ -121,6 +121,39 @@ class Board:
 
     def getBoardDisplay(self) -> str:
         return "\n".join([" ".join([str(tile) for tile in row]) for row in self.board])
+    
+    def getMatchingSets(self) -> Set[Tile]:
+        matched_tiles = set()
+
+        # Horizontal matches
+        for i in range(self.height):
+            for j in range(self.width - 2):
+                if (self.board[i][j].contents.content == self.board[i][j + 1].contents.content == 
+                    self.board[i][j + 2].contents.content and self.board[i][j].contents.content is not None):
+                    matched_tiles.update({self.board[i][j], self.board[i][j + 1], self.board[i][j + 2]})
+
+        # Vertical matches
+        for j in range(self.width):
+            for i in range(self.height - 2):
+                if (self.board[i][j].contents.content == self.board[i + 1][j].contents.content == 
+                    self.board[i + 2][j].contents.content and self.board[i][j].contents.content is not None):
+                    matched_tiles.update({self.board[i][j], self.board[i + 1][j], self.board[i + 2][j]})
+
+        return matched_tiles
+
+    def clearTileSet(self, ts: Set[Tile]) -> None:
+        for tile in ts:
+            tile.contents.clearContent()
+
+    def getMatchingBoardDisplay(self) -> str:
+        matched_tiles = self.getMatchingSets()
+
+        return "\n".join([ 
+            " ".join(
+                str(tile.contents.content) if tile in matched_tiles else "." for tile in row
+            )
+            for row in self.board
+        ])
 
 
 # Player class
@@ -171,11 +204,20 @@ def play_game():
 
             if first_tile and second_tile:
                 current_player.board.swapPositions(first_tile, second_tile)
+                print(f"{current_player} Board after tile swaps:")
+                print(current_player.board.getBoardDisplay())
+
+                print(f"{current_player} Board matches:")
+                print(current_player.board.getMatchingBoardDisplay())
 
                 # After swapping, clear matches and apply gravity
-                while current_player.board.clearMatches():
+                while current_player.board.clearTileSet(current_player.board.getMatchingSets()):
                     current_player.board.applyGravity()
                     current_player.board.fillMissingTiles()
+                
+                current_player.board.fillMissingTiles()
+                print(f"{current_player} Board after matches cleared:")
+                print(current_player.board.getBoardDisplay())
 
                 # Switch players
                 current_player = player2 if current_player == player1 else player1

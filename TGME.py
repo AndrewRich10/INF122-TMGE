@@ -37,19 +37,19 @@ class TileContents:
 
 # Tile class
 class Tile:
-    def __init__(self, position: tuple, colors: List[str], board: 'Board'):
+    def __init__(self, position: tuple, colors: List[Any], board: 'Board'):
         self.position = position
         self.contents = TileContents(colors)
         self.board = board
         self.partOfShape = None  # To be used with TileShape
 
     def __repr__(self):
-        return self.contents.content or " "
+        return repr(self.contents.content) or " "
 
 
 # Board class
 class Board:
-    def __init__(self, height: int, width: int, colors: List[str]):
+    def __init__(self, height: int, width: int, colors: List[Any]):
         self.height = height
         self.width = width
         self.board = [[Tile((i, j), colors, self) for j in range(width)] for i in range(height)]

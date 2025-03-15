@@ -24,6 +24,9 @@ class Jewel:
             border = ' '
         return self.color_code + border + self.body + border + RESET
     
+class BejeweledGameOver(Exception):
+    pass
+    
 
 class Bejeweled:
     def __init__(self, players: list[PlayerProfile]):
@@ -39,7 +42,10 @@ class Bejeweled:
 
 
     def playGame(self)-> dict[int, int]:
-        self._runGame()
+        try:
+            self._runGame()
+        except BejeweledGameOver:
+            pass
         return self._scores
     
 
@@ -61,11 +67,19 @@ class Bejeweled:
             self._showBoardAndScore()
         
         # Game Complete Phase
+        self._concludeGame()
         return
     
+    def _concludeGame(self):
+        print("\nGAME OVER\n")
+        print("Total Score:")
+        for player in self._players:
+            print("Player " + str(player.player_id) + ": " + str(self._scores[player.player_id]))
+    
     def _gameOver(self):
-        print("GAME OVER")
-        raise Exception("GAME OVER")
+        print("\nYour move failed to cause a match. Player " + str(self._players[self._player_turn].player_id) + " loses.")
+        print("\nGAME OVER!")
+        raise BejeweledGameOver()
     
     def _showBoardAndScore(self):
         print("\n" * 20)
@@ -144,11 +158,16 @@ class Bejeweled:
     
     def _refillBoard(self):
         replacementBoard: Board
+        attempts = 0
         while (True):
+            attempts += 1
             replacementBoard = copy.deepcopy(self._board)
             replacementBoard.fillMissingTiles()
             if (not self._matchesExist(replacementBoard) and self._futureMatchesExist(replacementBoard)): 
                 break
+            if attempts > 100:
+                self._makeInitialBoard()
+                return
         self._board = replacementBoard
 
     def _makeInitialBoard(self):

@@ -130,7 +130,6 @@ class Bejeweled:
                 second_tile = self._board.getTileAt(first_row + x, first_col + y)
                 if not self._board.isWithinBounds(first_row + x, first_col + y):
                     raise ValueError()
-                
                 return (first_tile, second_tile)
             except ValueError:
                 self._showBoardAndScore()
@@ -171,7 +170,6 @@ class Bejeweled:
 
     def _futureMatchesExist(self, board: Board) -> bool:
         def hasMatchingMove(x: int, y: int, board: Board):
-            
             for i, j in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
                 xb = x + i
                 yb = y + j

@@ -91,7 +91,7 @@ class Bejeweled:
     def _cascadePhase(self):
         matchSet = self._board.getMatchingSets()
         if (len(matchSet) == 0):
-            self._gameOver()
+            pass#self._gameOver()
         while (len(matchSet) != 0):
             # Board after move or refill
             self._showBoardAndScore()
@@ -163,7 +163,7 @@ class Bejeweled:
             attempts += 1
             replacementBoard = copy.deepcopy(self._board)
             replacementBoard.fillMissingTiles()
-            if (not self._matchesExist(replacementBoard) and self._futureMatchesExist(replacementBoard)): 
+            if (self._futureMatchesExist(replacementBoard)): 
                 break
             if attempts > 100:
                 self._makeInitialBoard()

@@ -27,7 +27,6 @@ class Jewel:
 class BejeweledGameOver(Exception):
     pass
     
-
 class Bejeweled:
     def __init__(self, players: list[PlayerProfile]):
         self._board: Board = Board(8, 8, [Jewel('R', RED), Jewel('G', GREEN), Jewel('B', BLUE), Jewel('Y', YELLOW), Jewel('O', ORANGE), Jewel('P', PURPLE), Jewel('W', WHITE)])
@@ -40,7 +39,6 @@ class Bejeweled:
         for player in players:
             self._scores[player.player_id] = 0
 
-
     def playGame(self)-> dict[int, int]:
         try:
             self._runGame()
@@ -48,73 +46,58 @@ class Bejeweled:
             pass
         return self._scores
     
-
     def _runGame(self):
         self._showBoardAndScore()
-        # Show Board
         while (self._currentTurnNumber <= self._turnsToPlay):
-            # Collect moves until valid
-            jewel1, jewel2 = self._collectMovePhase()
+            jewel1, jewel2 = self._collectMovePhase() # Collect moves until valid
 
-            # Handle the move provided
-            self._handleMovePhase(jewel1, jewel2)
+            self._handleMovePhase(jewel1, jewel2) # Handle the move provided
 
-            # Cascading phase / Match Failure, game over
-            self._cascadePhase()
+            self._cascadePhase() # Cascading phase / Match Failure, game over
 
-            self._currentTurnNumber += 1
+            self._currentTurnNumber += 1 # End of Turn
             self._player_turn = (self._currentTurnNumber - 1) % len(self._players)
             self._showBoardAndScore()
-        
-        # Game Complete Phase
-        self._concludeGame()
+        self._concludeGame() # Game Complete Phase
         return
     
     def _concludeGame(self):
-        print("\nGAME OVER\n")
-        print("Total Score:")
+        print("\nGAME OVER!\n\nTotal Score:")
         for player in self._players:
             print("Player " + str(player.player_id) + ": " + str(self._scores[player.player_id]))
     
     def _gameOver(self):
-        print("\nYour move failed to cause a match. Player " + str(self._players[self._player_turn].player_id) + " loses.")
-        print("\nGAME OVER!")
+        print("\nYour move failed to cause a match. Player " + str(self._players[self._player_turn].player_id) + " loses.\n\nGAME OVER!")
         raise BejeweledGameOver()
     
     def _showBoardAndScore(self):
         print("\n" * 20)
         print(self._board.getBoardDisplay())
-        print()
-        print("Player " + str(self._players[self._player_turn].player_id) + ", Turn " + str(self._currentTurnNumber) + "/" + str(self._turnsToPlay))
+        print("\nPlayer " + str(self._players[self._player_turn].player_id) + ", Turn " + str(self._currentTurnNumber) + "/" + str(self._turnsToPlay))
         print("Score " + str(self._scores[self._players[self._player_turn].player_id]))
     
     def _cascadePhase(self):
         matchSet = self._board.getMatchingSets()
         if (len(matchSet) == 0):
-            pass#self._gameOver()
+            self._gameOver()
         while (len(matchSet) != 0):
-            # Board after move or refill
-            self._showBoardAndScore()
+            self._showBoardAndScore() # Board after move or refill
             sleep(1)
 
-            # Board During Matches
-            self._markMatchers(matchSet)
+            self._markMatchers(matchSet) # Board During Matches
             self._scores[self._player_turn] += len(matchSet)
             self._showBoardAndScore()
             sleep(1)
 
-            # Board after matches
-            self._board.clearTileSet(matchSet)
+            self._board.clearTileSet(matchSet) # Board after matches
             self._showBoardAndScore()
             sleep(1)
 
-            # Board after gravity
-            self._board.applyGravity()
+            self._board.applyGravity() # Board after gravity
             self._showBoardAndScore()
             sleep(1)
 
-            # Perform refill
-            self._refillBoard()            
+            self._refillBoard() # Perform refill        
             matchSet = self._board.getMatchingSets()
 
     def _markMatchers(self, matchers: Set[Tile]):
@@ -125,7 +108,6 @@ class Bejeweled:
     def _handleMovePhase(self, jewel1: Tile, jewel2: Tile):
         self._board.swapPositions(jewel1, jewel2)
         self._showBoardAndScore()
-        return
     
     def _collectMovePhase(self) -> tuple[Tile, Tile]:
         while (True):
@@ -184,12 +166,10 @@ class Bejeweled:
             else:
                 self._board = Board(8, 8, [Jewel('R', RED), Jewel('G', GREEN), Jewel('B', BLUE), Jewel('Y', YELLOW), Jewel('O', ORANGE), Jewel('P', PURPLE), Jewel('W', WHITE)])
             
-
     def _matchesExist(self, board: Board):
         return len(board.getMatchingSets()) > 0
 
     def _futureMatchesExist(self, board: Board) -> bool:
-
         def hasMatchingMove(x: int, y: int, board: Board):
             
             for i, j in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
@@ -212,9 +192,6 @@ class Bejeweled:
                 if hasMatchingMove(x, y, scenarioBoard):
                     return True
         return False
-
-    
-
 
 if __name__ == '__main__':
     game = Bejeweled([PlayerProfile(0, [], 0, 0), PlayerProfile(1, [], 0, 0)])

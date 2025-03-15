@@ -218,4 +218,5 @@ class Bejeweled:
 
 if __name__ == '__main__':
     game = Bejeweled([PlayerProfile(0, [], 0, 0), PlayerProfile(1, [], 0, 0)])
+    game = Bejeweled([PlayerProfile(0, [], 0, 0)]) # Current setting: Play Bejeweled with 1 player
     game.playGame()

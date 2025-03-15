@@ -44,7 +44,7 @@ class Tile:
         self.partOfShape = None
 
     def __repr__(self):
-        return repr(self.contents.content) if self.contents.content is not None else " "
+        return repr(self.contents.content) if self.contents.content is not None else "   "
 
 
 # Board class

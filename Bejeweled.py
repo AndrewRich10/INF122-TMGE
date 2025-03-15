@@ -58,8 +58,9 @@ class Bejeweled:
             self._cascadePhase()
 
             self._currentTurnNumber += 1
+            self._showBoardAndScore()
         
-        # Game Over Phase
+        # Game Complete Phase
         return
     
     def _gameOver(self):
@@ -67,7 +68,7 @@ class Bejeweled:
         raise Exception("GAME OVER")
     
     def _showBoardAndScore(self):
-        print("\n" * 10)
+        print("\n" * 20)
         print(self._board.getBoardDisplay())
         print()
         print("Player " + str(self._players[self._player_turn].player_id) + ", Turn " + str(self._currentTurnNumber) + "/" + str(self._turnsToPlay))
@@ -101,7 +102,6 @@ class Bejeweled:
             # Perform refill
             self._refillBoard()            
             matchSet = self._board.getMatchingSets()
-        self._showBoardAndScore()
 
     def _markMatchers(self, matchers: Set[Tile]):
         for tile in matchers:

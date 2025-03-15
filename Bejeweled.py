@@ -29,7 +29,7 @@ class Bejeweled:
     def __init__(self, players: list[PlayerProfile]):
         self._board: Board = Board(8, 8, [Jewel('R', RED), Jewel('G', GREEN), Jewel('B', BLUE), Jewel('Y', YELLOW), Jewel('O', ORANGE), Jewel('P', PURPLE), Jewel('W', WHITE)])
         self._makeInitialBoard()
-        self._turnsToPlay: int = len(players) * 10
+        self._turnsToPlay: int = len(players) * 5
         self._player_turn = 0
         self._currentTurnNumber = 1
         self._players: list[PlayerProfile] = players
@@ -47,7 +47,6 @@ class Bejeweled:
         self._showBoardAndScore()
         # Show Board
         while (self._currentTurnNumber <= self._turnsToPlay):
-            self._player_turn = self._player_turn % len(self._players)
             # Collect moves until valid
             jewel1, jewel2 = self._collectMovePhase()
 
@@ -58,6 +57,7 @@ class Bejeweled:
             self._cascadePhase()
 
             self._currentTurnNumber += 1
+            self._player_turn = (self._currentTurnNumber - 1) % len(self._players)
             self._showBoardAndScore()
         
         # Game Complete Phase
@@ -163,7 +163,7 @@ class Bejeweled:
             if (self._futureMatchesExist(self._board)):
                 break
             else:
-                self._board = Board(8, 8, ['R', 'G', 'B', 'Y', 'O', 'P', 'W'])
+                self._board = Board(8, 8, [Jewel('R', RED), Jewel('G', GREEN), Jewel('B', BLUE), Jewel('Y', YELLOW), Jewel('O', ORANGE), Jewel('P', PURPLE), Jewel('W', WHITE)])
             
 
     def _matchesExist(self, board: Board):
@@ -198,5 +198,5 @@ class Bejeweled:
 
 
 if __name__ == '__main__':
-    game = Bejeweled([PlayerProfile(0, [], 0, 0)])
+    game = Bejeweled([PlayerProfile(0, [], 0, 0), PlayerProfile(1, [], 0, 0)])
     game.playGame()

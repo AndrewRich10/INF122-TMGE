@@ -35,6 +35,105 @@ class TileContents:
         self.content = None
 
 
+# TileShape class
+class TileShape:
+    def __init__(self, hasGravity: bool, board: 'Board'):
+        self.hasGravity = hasGravity
+        self.board = board
+        self.tiles = []
+    
+    def createTileShape(self, tiles: List['Tile']):
+        self.tiles = tiles
+        self.hasGravity = False
+    
+    def rotateTileShape(self): # row = position[0], column = position[1]
+        # [ ,  ]
+        # [R, Y] - Moves Y to be above R
+        if self.tiles[1].position[0] == self.tiles[0].position[0]:
+            if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
+                new_position = (self.tiles[0].position[0] - 1, self.tiles[0].position[1])
+                if not self.board.isTileAt(new_position[0], new_position[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                    self.tiles[1].position = new_position
+        # [Y,  ]
+        # [R,  ] - Moves Y to be beside R and swaps their colors
+        elif self.tiles[1].position[1] == self.tiles[0].position[1]:
+            if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
+                new_position = (self.tiles[0].position[0], self.tiles[0].position[1] + 1)
+                if not self.board.isTileAt(new_position[0], new_position[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                    self.tiles[1].position = new_position
+                    self.board.swapPositions(self.tiles[0], self.tiles[1])
+                    self.tiles = [self.tiles[1], self.tiles[0]]
+    
+    # Moves whole tile shape down 1 unit
+    def moveTileShape(self):
+        # If tile shape is horizontal
+        if self.tiles[1].position[0] == self.tiles[0].position[0]:
+            if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
+                new_position1 = (self.tiles[0].position[0] + 1, self.tiles[0].position[1])
+                new_position2 = (self.tiles[1].position[0] + 1, self.tiles[1].position[1])
+                if not self.board.isTileAt(new_position1[0], new_position1[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                    self.tiles[0].position = new_position1
+                    self.tiles[1].position = new_position2
+        # If tile shape is vertical
+        elif self.tiles[1].position[1] == self.tiles[0].position[1]:
+            if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
+                new_position1 = (self.tiles[0].position[0] + 1, self.tiles[0].position[1])
+                new_position2 = (self.tiles[1].position[0] + 1, self.tiles[1].position[1])
+                if not self.board.isTileAt(new_position1[0], new_position1[1]) and not self.board.isTileAt(new_position2[0], new_position2[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                    self.tiles[0].position = new_position1
+                    self.tiles[1].position = new_position2
+
+    def shiftTileShape(self, direction: Direction):
+        match direction:
+            case "UP":
+                self.rotateTileShape()
+            case "DOWN":
+                self.moveTileShape()
+            case "LEFT":
+                # If tile shape is horizontal
+                if self.tiles[1].position[0] == self.tiles[0].position[0]:
+                    if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
+                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] - 1)
+                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] - 1)
+                        if not self.board.isTileAt(new_position1[0], new_position1[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                            self.tiles[0].position = new_position1
+                            self.tiles[1].position = new_position2
+                # If tile shape is vertical
+                elif self.tiles[1].position[1] == self.tiles[0].position[1]:
+                    if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
+                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] - 1)
+                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] - 1)
+                        if not self.board.isTileAt(new_position1[0], new_position1[1]) and not self.board.isTileAt(new_position2[0], new_position2[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                            self.tiles[0].position = new_position1
+                            self.tiles[1].position = new_position2
+            case "RIGHT":
+                # If tile shape is horizontal
+                if self.tiles[1].position[0] == self.tiles[0].position[0]:
+                    if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
+                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] + 1)
+                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] + 1)
+                        if not self.board.isTileAt(new_position1[0], new_position1[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                            self.tiles[0].position = new_position1
+                            self.tiles[1].position = new_position2
+                # If tile shape is vertical
+                elif self.tiles[1].position[1] == self.tiles[0].position[1]:
+                    if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
+                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] + 1)
+                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] + 1)
+                        if not self.board.isTileAt(new_position1[0], new_position1[1]) and not self.board.isTileAt(new_position2[0], new_position2[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
+                            self.tiles[0].position = new_position1
+                            self.tiles[1].position = new_position2
+
+    def removeTileShape(self):
+        self.unlinkAllTiles()
+        self.tiles = []
+
+    def unlinkAllTiles(self):
+        self.hasGravity = True
+        self.tiles[0].partOfShape = None
+        self.tiles[1].partOfShape = None
+
+
 # Tile class
 class Tile:
     def __init__(self, position: tuple, colors: List[Any], board: 'Board'):
@@ -103,9 +202,11 @@ class Board:
             for j in range(self.width):
                 if self.board[i][j].contents.isEmpty():
                     self.board[i][j].contents.content = random.choice(self.colors)
-
+    
     def isTileAt(self, x: int, y: int) -> bool:
-        return 0 <= x < self.height and 0 <= y < self.width
+        if self.isWithinBounds(x, y):
+            return not self.board[x][y].contents.isEmpty()
+            
 
     def getTileAt(self, x: int, y: int) -> Optional[Tile]:
         if self.isTileAt(x, y):
@@ -113,11 +214,11 @@ class Board:
         return None
 
     def setTileAt(self, x: int, y: int, tile: Tile) -> None:
-        if self.isTileAt(x, y):
+        if self.isWithinBounds(x, y):
             self.board[x][y] = tile
 
     def isWithinBounds(self, x: int, y: int) -> bool:
-        return self.isTileAt(x, y)
+        return 0 <= x < self.height and 0 <= y < self.width
 
     def getBoardDisplay(self) -> str:
         return "\n".join([" ".join([str(tile) for tile in row]) for row in self.board])

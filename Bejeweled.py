@@ -44,6 +44,8 @@ class Bejeweled:
             self._runGame()
         except BejeweledGameOver:
             pass
+        print("(press enter when finished viewing)")
+        input()
         return self._scores
     
     def _runGame(self):

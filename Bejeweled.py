@@ -87,7 +87,10 @@ class Bejeweled:
             sleep(1)
 
             self._markMatchers(matchSet) # Board During Matches
-            self._scores[self._player_turn] += len(matchSet)
+            if len(self._players) == 2:
+                self._scores[self._player_turn] += len(matchSet)
+            else:
+                self._scores[self._players[0].player_id] += len(matchSet)
             self._showBoardAndScore()
             sleep(1)
 

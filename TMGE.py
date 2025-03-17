@@ -46,100 +46,89 @@ class TileShape:
         self.tiles = tiles
         self.hasGravity = False
     
-    def rotateTileShape(self): # row = position[0], column = position[1]
-        # [ ,  ]
-        # [R, Y] - Moves Y to be above R
-        if self.tiles[1].position[0] == self.tiles[0].position[0]:
-            if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
-                new_position = (self.tiles[0].position[0] - 1, self.tiles[0].position[1])
-                if not self.board.isTileAt(new_position[0], new_position[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
-                    self.board.swapPositions(self.tiles[1], self.board.board[new_position[0]][new_position[1]])
-                    self.tiles[1] = self.board.board[new_position[0]][new_position[1]]
-        # [Y,  ]
-        # [R,  ] - Moves Y to be beside R and swaps their colors
-        elif self.tiles[1].position[1] == self.tiles[0].position[1]:
-            if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
-                new_position = (self.tiles[0].position[0], self.tiles[0].position[1] + 1)
-                if not self.board.isTileAt(new_position[0], new_position[1]) and self.board.isWithinBounds(new_position[0], new_position[1]):
-                    self.board.swapPositions(self.tiles[1], self.board.board[new_position[0]][new_position[1]])
-                    self.tiles[1] = self.board.board[new_position[0]][new_position[1]]
-                    self.board.swapPositions(self.tiles[1], self.tiles[0])
-                    temp = self.tiles[0].position
-                    self.tiles[0] = self.board.board[self.tiles[1].position[0]][self.tiles[1].position[1]]
-                    self.tiles[1] = self.board.board[temp[0]][temp[1]]
-                    self.tiles = [self.tiles[1], self.tiles[0]]
+    def rotateTileShape(self):
+        if len(self.tiles) < 2:
+            return
 
-    # Moves whole tile shape down 1 unit
+        pivot = self.tiles[0].position
+        new_tiles = []
+        
+        for tile in self.tiles:
+            row, col = tile.position
+            relative_row, relative_col = row - pivot[0], col - pivot[1]
+            
+            new_row = pivot[0] - relative_col
+            new_col = pivot[1] + relative_row
+            
+            if not self.board.isWithinBounds(new_row, new_col):
+                return
+            
+            if self.board.isTileAt(new_row, new_col) and self.board.board[new_row][new_col] not in self.tiles:
+                return
+            
+            new_tiles.append((new_row, new_col, tile.contents.content))
+        
+        for tile in self.tiles:
+            self.board.board[tile.position[0]][tile.position[1]].contents.clearContent()
+
+        for i, (tile, (new_row, new_col, content)) in enumerate(zip(self.tiles, new_tiles)):
+            self.board.setTileAt(new_row, new_col, content)
+            self.tiles[i] = self.board.getTileAt(new_row, new_col)
+
+
     def moveTileShape(self):
-        # If tile shape is horizontal
-        if self.tiles[1].position[0] == self.tiles[0].position[0]:
-            if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
-                new_position1 = (self.tiles[0].position[0] + 1, self.tiles[0].position[1])
-                new_position2 = (self.tiles[1].position[0] + 1, self.tiles[1].position[1])
-                if not self.board.isTileAt(new_position1[0], new_position1[1]) and not self.board.isTileAt(new_position2[0], new_position2[1]) and self.board.isWithinBounds(new_position1[0], new_position1[1]):
-                    self.board.swapPositions(self.tiles[0], self.board.board[new_position1[0]][new_position1[1]])
-                    self.board.swapPositions(self.tiles[1], self.board.board[new_position2[0]][new_position2[1]])
-                    self.tiles[0] = self.board.board[new_position1[0]][new_position1[1]]
-                    self.tiles[1] = self.board.board[new_position2[0]][new_position2[1]]
-        # If tile shape is vertical
-        elif self.tiles[1].position[1] == self.tiles[0].position[1]:
-            if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
-                new_position1 = (self.tiles[0].position[0] + 1, self.tiles[0].position[1])
-                new_position2 = (self.tiles[1].position[0] + 1, self.tiles[1].position[1])
-                if not self.board.isTileAt(new_position1[0], new_position1[1]) and self.board.isWithinBounds(new_position1[0], new_position1[1]):
-                    self.board.swapPositions(self.tiles[0], self.board.board[new_position1[0]][new_position1[1]])
-                    self.board.swapPositions(self.tiles[1], self.board.board[new_position2[0]][new_position2[1]])
-                    self.tiles[0] = self.board.board[new_position1[0]][new_position1[1]]
-                    self.tiles[1] = self.board.board[new_position2[0]][new_position2[1]]
+        if not self.tiles:
+            return
+        
+        new_tiles = []
+        
+        for tile in self.tiles:
+            new_row = tile.position[0] + 1
+            new_col = tile.position[1]
+            
+            if not self.board.isWithinBounds(new_row, new_col):
+                return
+            
+            if self.board.isTileAt(new_row, new_col) and self.board.board[new_row][new_col] not in self.tiles:
+                return
+            
+            new_tiles.append((new_row, new_col, tile.contents.content))
+        
+        for tile in self.tiles:
+            self.board.board[tile.position[0]][tile.position[1]].contents.clearContent()
+
+        for i, (tile, (new_row, new_col, content)) in enumerate(zip(self.tiles, new_tiles)):
+            self.board.setTileAt(new_row, new_col, content)
+            self.tiles[i] = self.board.getTileAt(new_row, new_col)
+
+
 
     def shiftTileShape(self, direction: Direction):
-        match direction:
-            case Direction.UP:
-                self.rotateTileShape()
-            case Direction.DOWN:
-                self.moveTileShape()
-            case Direction.LEFT:
-                # If tile shape is horizontal
-                if self.tiles[1].position[0] == self.tiles[0].position[0]:
-                    if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
-                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] - 1)
-                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] - 1)
-                        if not self.board.isTileAt(new_position1[0], new_position1[1]) and self.board.isWithinBounds(new_position1[0], new_position1[1]):
-                            self.board.swapPositions(self.tiles[0], self.board.board[new_position1[0]][new_position1[1]])
-                            self.tiles[0] = self.board.board[new_position1[0]][new_position1[1]]
-                            self.board.swapPositions(self.tiles[1], self.board.board[new_position2[0]][new_position2[1]])
-                            self.tiles[1] = self.board.board[new_position2[0]][new_position2[1]]
-                # If tile shape is vertical
-                elif self.tiles[1].position[1] == self.tiles[0].position[1]:
-                    if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
-                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] - 1)
-                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] - 1)
-                        if not self.board.isTileAt(new_position1[0], new_position1[1]) and not self.board.isTileAt(new_position2[0], new_position2[1]) and self.board.isWithinBounds(new_position1[0], new_position1[1]):
-                            self.board.swapPositions(self.tiles[0], self.board.board[new_position1[0]][new_position1[1]])
-                            self.tiles[0] = self.board.board[new_position1[0]][new_position1[1]]
-                            self.board.swapPositions(self.tiles[1], self.board.board[new_position2[0]][new_position2[1]])
-                            self.tiles[1] = self.board.board[new_position2[0]][new_position2[1]]
-            case Direction.RIGHT:
-                # If tile shape is horizontal
-                if self.tiles[1].position[0] == self.tiles[0].position[0]:
-                    if self.tiles[1].position[1] == self.tiles[0].position[1] + 1:
-                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] + 1)
-                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] + 1)
-                        if not self.board.isTileAt(new_position2[0], new_position2[1]) and self.board.isWithinBounds(new_position2[0], new_position2[1]):
-                            self.board.swapPositions(self.tiles[1], self.board.board[new_position2[0]][new_position2[1]])
-                            self.tiles[1] = self.board.board[new_position2[0]][new_position2[1]]
-                            self.board.swapPositions(self.tiles[0], self.board.board[new_position1[0]][new_position1[1]])
-                            self.tiles[0] = self.board.board[new_position1[0]][new_position1[1]]
-                # If tile shape is vertical
-                elif self.tiles[1].position[1] == self.tiles[0].position[1]:
-                    if self.tiles[1].position[0] == self.tiles[0].position[0] - 1:
-                        new_position1 = (self.tiles[0].position[0], self.tiles[0].position[1] + 1)
-                        new_position2 = (self.tiles[1].position[0], self.tiles[1].position[1] + 1)
-                        if not self.board.isTileAt(new_position2[0], new_position2[1]) and not self.board.isTileAt(new_position1[0], new_position1[1]) and self.board.isWithinBounds(new_position2[0], new_position2[1]):
-                            self.board.swapPositions(self.tiles[1], self.board.board[new_position2[0]][new_position2[1]])
-                            self.tiles[1] = self.board.board[new_position2[0]][new_position2[1]]
-                            self.board.swapPositions(self.tiles[0], self.board.board[new_position1[0]][new_position1[1]])
-                            self.tiles[0] = self.board.board[new_position1[0]][new_position1[1]]
+        if direction == Direction.UP:
+            self.rotateTileShape()
+        elif direction == Direction.DOWN:
+            self.moveTileShape()
+        else:
+            delta_col = -1 if direction == Direction.LEFT else 1
+            new_tiles = []
+
+            for tile in self.tiles:
+                new_row, new_col = tile.position[0], tile.position[1] + delta_col
+                
+                if not self.board.isWithinBounds(new_row, new_col):
+                    return
+                
+                if self.board.isTileAt(new_row, new_col) and self.board.board[new_row][new_col] not in self.tiles:
+                    return
+                
+                new_tiles.append((new_row, new_col, tile.contents.content))
+            
+            for tile in self.tiles:
+                self.board.board[tile.position[0]][tile.position[1]].contents.clearContent()
+
+            for i, (tile, (new_row, new_col, content)) in enumerate(zip(self.tiles, new_tiles)):
+                self.board.setTileAt(new_row, new_col, content)
+                self.tiles[i] = self.board.getTileAt(new_row, new_col)
 
     def removeTileShape(self):
         self.unlinkAllTiles()
@@ -180,6 +169,19 @@ class Board:
             for j in range(self.width):
                 self.board[i][j].contents.content = None
     
+    def clearHorizontal(self) -> None:
+        cleared_rows = 0
+        for i in range(len(self.board)):
+            if all(cell.contents.content for cell in self.board[i]):
+                cleared_rows += 1
+                for cell in self.board[i]:
+                    cell.contents.clearContent()
+                
+                for j in range(i, 0, -1):
+                    for k in range(len(self.board[j])):
+                        self.board[j][k].contents.content = self.board[j-1][k].contents.content
+
+
     def clearMatches(self) -> None:
         matched = False
         to_clear = set()
@@ -237,9 +239,9 @@ class Board:
             return self.board[x][y]
         return None
 
-    def setTileAt(self, x: int, y: int, tile: Tile) -> None:
+    def setTileAt(self, x: int, y: int, content: Tile) -> None:
         if self.isWithinBounds(x, y):
-            self.board[x][y] = tile
+            self.board[x][y].contents.content = content
 
     def isWithinBounds(self, x: int, y: int) -> bool:
         return 0 <= x < self.height and 0 <= y < self.width
@@ -364,15 +366,16 @@ def play_game():
     
     # Create an initial random tile shape for the player
     def spawnCurrentTileShape():
+        # Define a flexible initial shape (e.g., 3 tiles in a row)
+        initial_positions = [(0, 4), (1, 4), (0, 5)]  # Example: horizontal line
         initial_tiles = [
-            Tile(position=(0, 4), colors=colors, board=player.board),
-            Tile(position=(0, 5), colors=colors, board=player.board)
+            Tile(position=pos, colors=colors, board=player.board) for pos in initial_positions
         ]
-        initial_tiles[0].contents.content = initial_tiles[0].contents.getRandomContent()
-        initial_tiles[1].contents.content = initial_tiles[1].contents.getRandomContent()
+        for tile in initial_tiles:
+            tile.contents.content = tile.contents.getRandomContent()  # Assign random content
+        for tile in initial_tiles:
+            player.board.board[tile.position[0]][tile.position[1]] = tile
         current_tile_shape.createTileShape(initial_tiles)
-        player.board.setTileAt(0, 4, initial_tiles[0])
-        player.board.setTileAt(0, 5, initial_tiles[1])
     
     spawnCurrentTileShape()
 
@@ -393,30 +396,37 @@ def play_game():
         elif move == "down":
             current_tile_shape.shiftTileShape(Direction.DOWN)
         elif move == "rotate":
-            current_tile_shape.shiftTileShape(Direction.UP)
+            current_tile_shape.shiftTileShape(Direction.UP)  # Use the updated rotation method
 
         # Move the tile shape down if possible (gravity effect)
         current_tile_shape.moveTileShape()
 
-        # Checks if reached the bottom of the grid
-        if current_tile_shape.tiles[0].position[0] == player.board.height - 1:
-            player.board.clearTileSet(player.board.getMatchingSets())
-            spawnCurrentTileShape()
-        # Checks if landed on another tile vertically
-        if player.board.getTileAt(current_tile_shape.tiles[1].position[0] + 1, current_tile_shape.tiles[1].position[1]) == current_tile_shape.tiles[0]:
-            if player.board.isTileAt(current_tile_shape.tiles[0].position[0] + 1, current_tile_shape.tiles[0].position[1]):
-                player.board.clearTileSet(player.board.getMatchingSets())
-                spawnCurrentTileShape()
-        # Checks if landed on another tile horizontally
-        elif (player.board.isTileAt(current_tile_shape.tiles[0].position[0] + 1, current_tile_shape.tiles[0].position[1]) or
-            player.board.isTileAt(current_tile_shape.tiles[1].position[0] + 1, current_tile_shape.tiles[1].position[1])):
-                player.board.clearTileSet(player.board.getMatchingSets())
-                # Game Over condition
-                if player.board.isTileAt(0, 4) or player.board.isTileAt(0, 5):
-                    print("Game Over!")
-                    break
-                spawnCurrentTileShape()
+        # Check if the tile shape has landed or reached the bottom
+        landed = False
+        for tile in current_tile_shape.tiles:
+            # Check if any tile is at the bottom of the grid
+            if tile.position[0] == player.board.height - 1:
+                landed = True
+                break
+            # # Check if any tile is directly above another tile
+            # if player.board.isTileAt(tile.position[0] + 1, tile.position[1]):
+            #     landed = True
+            #     break
+            
+            # Check if the new position is occupied by a tile not in the current TileShape
+            if player.board.isTileAt(tile.position[0] + 1, tile.position[1]) \
+                  and player.board.board[tile.position[0] + 1][tile.position[1]] not in current_tile_shape.tiles:
+                return  # Cancel movement if any tile is occupied by an external tile
 
+        if landed:
+            # Clear matching sets if any
+            player.board.clearTileSet(player.board.getMatchingSets())
+            # Check for game over condition
+            if any(tile.position[0] == 0 for tile in current_tile_shape.tiles):
+                print("Game Over!")
+                break
+            # Spawn a new tile shape
+            spawnCurrentTileShape()
 
 if __name__ == "__main__":
     print("Welcome to TMGE! Input 'exit' at any time to quit the game for both users!")

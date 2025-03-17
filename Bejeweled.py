@@ -27,7 +27,7 @@ class Jewel:
 class BejeweledGameOver(Exception):
     pass
     
-class Bejeweled:
+class Bejeweled(ShellGame):
     def __init__(self, players: list[PlayerProfile]):
         self._board: Board = Board(8, 8, [Jewel('R', RED), Jewel('G', GREEN), Jewel('B', BLUE), Jewel('Y', YELLOW), Jewel('O', ORANGE), Jewel('P', PURPLE), Jewel('W', WHITE)])
         self._makeInitialBoard()

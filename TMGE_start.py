@@ -1,5 +1,6 @@
 import TMGE
 import Bejeweled
+import Tetris
 from time import sleep
 
 GAME_SELECT_ART_1 = """.... .....-+**#*+-.....  .
@@ -96,14 +97,18 @@ class TMGEshell:
             print("\n(press enter when finished viewing)")
             input()
 
-        
+        def playTetris():
+            Tetris.Tetris().playGame()
+            print("\n(press enter when finished viewing)")
+            input()
+
         def quitTMGEshell():
             self._stillRunning = False
 
         self._options = [MenuOption("Quit", quitTMGEshell),
                          MenuOption("Play Bejeweled", playBejeweled),
                          MenuOption("Play BejeweledVs", playBejeweledVs),
-                         MenuOption("Play Columns", None),
+                         MenuOption("Play Tetris", playTetris),
                          MenuOption("View Player Profiles", viewPlayerProfiles),
                          MenuOption("Add Player Profile", self.addPlayerProfile)]
 

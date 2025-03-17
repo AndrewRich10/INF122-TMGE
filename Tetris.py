@@ -5,7 +5,7 @@ shapes = {0 : ((1, 4), (1, 5), (1, 6), (1, 7)), 1 : ((0, 5), (0, 6), (1, 5), (1,
           3 : ((1, 5), (1, 6), (1, 7), (0, 7)), 4 : ((0, 5), (1, 4), (1, 5), (1, 6)), 5: ((1, 5), (1, 6), (0, 6), (0, 7)),\
             6 : ((0, 5), (0, 6), (1, 6), (1, 7))}
 
-class Tetris:
+class Tetris(ShellGame):
     def __init__(self):
         self.colors = ['R', 'G', 'B']
         self.player = PlayerProfile(1, self.colors, 20, 10)
@@ -19,7 +19,7 @@ class Tetris:
             self.player.board.board[tile.position[0]][tile.position[1]] = tile
         self.current_tile_shape.createTileShape(tiles)
 
-    def play_game(self):
+    def playGame(self):
         self.spawn_shape()
 
         print("Game Start!")
@@ -62,4 +62,4 @@ class Tetris:
             
 if __name__ == '__main__':
     tetris = Tetris()
-    tetris.play_game()
+    tetris.playGame()

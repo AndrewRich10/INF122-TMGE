@@ -2,7 +2,7 @@
 import random
 from enum import Enum
 from typing import List, Callable, Optional, Any, Set
-
+from abc import ABC, abstractmethod
 
 # Enum for Direction
 class Direction(Enum):
@@ -292,6 +292,12 @@ class PlayerProfile:
 
     def __repr__(self):
         return f"Player {self.player_id}"
+
+# ShellGame class:
+class ShellGame(ABC):
+    @abstractmethod
+    def playGame(self) -> Optional[dict[int, int]|None]:
+        pass
 
 
 '''

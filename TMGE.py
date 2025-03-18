@@ -102,7 +102,6 @@ class TileShape:
             self.tiles[i] = self.board.getTileAt(new_row, new_col)
 
 
-
     def shiftTileShape(self, direction: Direction):
         if direction == Direction.UP:
             self.rotateTileShape()
@@ -129,15 +128,6 @@ class TileShape:
             for i, (tile, (new_row, new_col, content)) in enumerate(zip(self.tiles, new_tiles)):
                 self.board.setTileAt(new_row, new_col, content)
                 self.tiles[i] = self.board.getTileAt(new_row, new_col)
-
-    def removeTileShape(self):
-        self.unlinkAllTiles()
-        self.tiles = []
-
-    def unlinkAllTiles(self):
-        self.hasGravity = True
-        self.tiles[0].partOfShape = None
-        self.tiles[1].partOfShape = None
 
 
 # Tile class
@@ -180,7 +170,6 @@ class Board:
                 for j in range(i, 0, -1):
                     for k in range(len(self.board[j])):
                         self.board[j][k].contents.content = self.board[j-1][k].contents.content
-
 
     def clearMatches(self) -> None:
         matched = False
@@ -233,7 +222,6 @@ class Board:
         if self.isWithinBounds(x, y):
             return not self.board[x][y].contents.isEmpty()
             
-
     def getTileAt(self, x: int, y: int) -> Optional[Tile]:
         if self.isTileAt(x, y):
             return self.board[x][y]
@@ -293,7 +281,8 @@ class PlayerProfile:
     def __repr__(self):
         return f"Player {self.player_id}"
 
-# ShellGame class:
+
+# ShellGame class
 class ShellGame(ABC):
     @abstractmethod
     def playGame(self) -> Optional[dict[int, int]|None]:

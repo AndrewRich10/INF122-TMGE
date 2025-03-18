@@ -7,7 +7,7 @@ shapes = {0 : ((1, 4), (1, 5), (1, 6), (1, 7)), 1 : ((0, 5), (0, 6), (1, 5), (1,
 
 class Tetris(ShellGame):
     def __init__(self):
-        self.colors = ['R', 'G', 'B']
+        self.colors = ['X']
         self.player = PlayerProfile(1, self.colors, 20, 10)
         self.player.board.clearBoard()
         self.current_tile_shape = TileShape(True, self.player.board)
